@@ -11,6 +11,15 @@ with open(token_file, 'r') as f:
 
 bot = commands.Bot(command_prefix="!", intents=discord.Intents.all())
 
+# Sync / commands on bot startup
+@bot.event
+async def on_ready():
+    try:
+        synced_commands = await bot.tree.sync()
+        print(f"[!] Synced {len(synced_commands)} Commands.")
+    except Exception as e:
+        print("Error syncing commands.")
+
 
 # !shutdown command - throws error dont worry!
 @bot.command()
