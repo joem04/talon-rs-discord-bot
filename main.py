@@ -21,6 +21,12 @@ async def on_ready():
         print("Error syncing commands.")
 
 
+# Test slash command.
+@bot.tree.command(name="hello", description="Test command to say hello!")
+async def hello(interaction: discord.Interaction):
+    await interaction.response.send_message(f"Hi! {interaction.user.mention}")
+
+
 # !shutdown command - throws error dont worry!
 @bot.command()
 @commands.is_owner()
