@@ -1,0 +1,3 @@
+class Payments:
+
+    pass
