@@ -21,13 +21,20 @@ async def shutdown(ctx):
 
 data_file = 'user_data.json'
 
-# Opens user data file and loads in file as user_data if it doesnt exists, creates it
+# Opens user data file and loads in file as user_data if it exists and has valid JSON, otherwise creates it
 if os.path.exists(data_file):
-    with open(data_file, 'r') as f:
-        user_data = json.load(f)
+    if os.path.getsize(data_file) > 0:  # Check if the file is not empty
+        with open(data_file, 'r') as f:
+            try:
+                user_data = json.load(f)  # Try to load the JSON data
+            except json.JSONDecodeError:
+                user_data = {}  # If JSON is invalid, initialize an empty dictionary
+    else:
+        user_data = {}  # If the file is empty, initialize an empty dictionary
 else:
-    with open(data_file, 'a'): pass
+    with open(data_file, 'a'): pass  # Create the file if it doesn't exist
     user_data = {}
+
 
 
 # Function to save user data to a file
