@@ -11,7 +11,7 @@ A multi-purpose Discord bot for my Talon RS Services Discord Server.
 
 ### Installing
 
-```pip install -r requirements.txt
+```pip install -r requirements.txt```
 
 ## Authors
 
