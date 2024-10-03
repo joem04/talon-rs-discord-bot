@@ -83,12 +83,14 @@ async def profile(interaction: discord.Interaction, member: discord.Member = Non
 
     # Ensure the user has an entry in user_data
     if user_id not in user_data:
-        user_data[user_id] = {'spent': 0, 'loyalty_points': 0}  # Initialize profile and save it to user_data
+        user_data[user_id] = {'spent': 0, 'loyalty_points': 0, 'bank': 0}  # Initialize profile and save it to user_data
         save_data()
 
     spent = user_data[user_id]['spent']
     loyalty_points = user_data[user_id]['loyalty_points']
+    bank = user_data[user_id]['bank']
     formatted_spent = format_amount(spent)
+    formatted_bank = format_amount(bank)
 
     # Create an embed for the profile
     embed = discord.Embed(
@@ -99,7 +101,8 @@ async def profile(interaction: discord.Interaction, member: discord.Member = Non
     # Set the description with the emoji directly included
     embed.description = (
         f"<:gold:1289649818066616371> **Total GP Spent:** {formatted_spent}\n"  # Replace with actual emoji ID
-        f"<:ticket:1289650551453126728> **Loyalty Points:** {loyalty_points}"
+        f"<:ticket:1289650551453126728> **Loyalty Points:** {loyalty_points}\n"
+        f"<:gold:1289649818066616371> **Bank:** {formatted_bank}\n"  # Replace with actual emoji ID
     )
 
     # Set the thumbnail using the user's avatar
