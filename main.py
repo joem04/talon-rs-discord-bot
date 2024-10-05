@@ -309,6 +309,52 @@ async def subtract_lp(interaction: discord.Interaction, points: int, member: dis
     await interaction.response.send_message(f"Subtracted {points} loyalty points from {member.mention}'s profile!")
 
 
+# Slash command to add an amount to a user's bank
+@bot.tree.command(name="add_bank", description="Add an amount to a user's bank")
+@commands.has_role("Admin")  # Only admins can add to the bank
+async def add_bank(interaction: discord.Interaction, amount: str, member: discord.Member = None):
+    if member is None:
+        member = interaction.user  # Default to the author if no member is mentioned
+
+    user_id = str(member.id)
+
+    # Ensure the user has an entry in user_data
+    if user_id not in user_data:
+        user_data[user_id] = {'spent': 0, 'loyalty_points': 0, 'bank': 0}
+        save_data()
+
+    # Parse and add the amount to the user's bank
+    amount_value = parse_amount(amount)
+    user_data[user_id]['bank'] += amount_value
+    save_data()
+
+    # Send a confirmation message
+    await interaction.response.send_message(f"Added {format_amount(amount_value)} to {member.mention}'s bank!")
+
+
+# Slash command to subtract an amount from a user's bank
+@bot.tree.command(name="subtract_bank", description="Subtract an amount from a user's bank")
+@commands.has_role("Admin")  # Only admins can subtract from the bank
+async def subtract_bank(interaction: discord.Interaction, amount: str, member: discord.Member = None):
+    if member is None:
+        member = interaction.user  # Default to the author if no member is mentioned
+
+    user_id = str(member.id)
+
+    # Ensure the user has an entry in user_data
+    if user_id not in user_data:
+        user_data[user_id] = {'spent': 0, 'loyalty_points': 0, 'bank': 0}
+        save_data()
+
+    # Parse and subtract the amount from the user's bank
+    amount_value = parse_amount(amount)
+    user_data[user_id]['bank'] -= amount_value
+    save_data()
+
+    # Send a confirmation message
+    await interaction.response.send_message(f"Subtracted {format_amount(amount_value)} from {member.mention}'s bank!")
+
+
 # Command to give users a random amount of gp assigned to their bank in their user data
 @bot.tree.command(name='daily', description='Daily chest command')
 async def daily(interaction: discord.Interaction, ):
