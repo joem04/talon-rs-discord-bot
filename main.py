@@ -2,6 +2,8 @@ import discord
 from discord.ext import commands
 import json
 import os
+from datetime import datetime, timedelta
+import random as r
 
 token_file = 'token.env'
 
@@ -83,14 +85,20 @@ async def profile(interaction: discord.Interaction, member: discord.Member = Non
 
     # Ensure the user has an entry in user_data
     if user_id not in user_data:
-        user_data[user_id] = {'spent': 0, 'loyalty_points': 0, 'bank': 0}  # Initialize profile and save it to user_data
+        # Initialize profile and save it to user_data
+        user_data[user_id] = {'spent': 0,
+                            'loyalty_points': 0, 
+                            'bank': 0, 
+                            'last_chest_redeem': ""}  
         save_data()
 
+    # Assigns json objects to variables
     spent = user_data[user_id]['spent']
     loyalty_points = user_data[user_id]['loyalty_points']
     bank = user_data[user_id]['bank']
     formatted_spent = format_amount(spent)
     formatted_bank = format_amount(bank)
+    last_chest_redeem = user_data[user_id]['last_chest_redeem']
 
     # Create an embed for the profile
     embed = discord.Embed(
@@ -301,9 +309,48 @@ async def subtract_lp(interaction: discord.Interaction, points: int, member: dis
     await interaction.response.send_message(f"Subtracted {points} loyalty points from {member.mention}'s profile!")
 
 
+# Command to give users a random amount of gp assigned to their bank in their user data
 @bot.tree.command(name='daily', description='Daily chest command')
-async def daily(interaction: discord.Interaction);
-    pass
+async def daily(interaction: discord.Interaction, ):
+
+    # Set variables
+    user_id = str(interaction.user.id)
+    last_redeem_time = user_data[user_id]['last_chest_redeem']
+    current_time = str(datetime.now())[0:19]
+
+    # Ensure the user has an entry in user_data - copied from /profile command
+    if user_id not in user_data:
+
+        # Initialize profile and save it to user_data
+        user_data[user_id] = {'spent': 0,
+                            'loyalty_points': 0, 
+                            'bank': 0, 
+                            'last_chest_redeem': ""} 
+    
+    # If last redeem date is not the same as the current date then allow daily command
+    elif str(last_redeem_time)[0:9] != current_time[0:9]:
+        user_data[user_id]['last_chest_redeem'] = str(current_time)
+        save_data()
+
+
+    else:
+        # Trim fractional part if it exists before converting to datetime
+        last_redeem = datetime.strptime(last_redeem_time[:19], "%Y-%m-%d %H:%M:%S")
+
+        # Convert the current_time string back to a datetime object for calculations
+        current_time_dt = datetime.strptime(current_time, "%Y-%m-%d %H:%M:%S")
+
+        # Calculate time until midnight for next redeem
+        next_day = datetime.combine(current_time_dt.date(), datetime.min.time()) + timedelta(days=1)
+        time_until_midnight = next_day - current_time_dt
+
+        # Calculate hours and minutes until the next day
+        hours, remainder = divmod(time_until_midnight.seconds, 3600)
+        minutes, _ = divmod(remainder, 60)
+
+        await interaction.response.send_message(
+            f"You can't redeem a daily chest for another {hours} hours and {minutes} minutes."
+        )
 
 
 # Runs the bot
