@@ -357,28 +357,35 @@ async def subtract_bank(interaction: discord.Interaction, amount: str, member: d
 
 # Command to give users a random amount of gp assigned to their bank in their user data
 @bot.tree.command(name='daily', description='Daily chest command')
-async def daily(interaction: discord.Interaction, ):
+async def daily(interaction: discord.Interaction):
 
     # Set variables
     user_id = str(interaction.user.id)
-    last_redeem_time = user_data[user_id]['last_chest_redeem']
-    current_time = str(datetime.now())[0:19]
 
     # Ensure the user has an entry in user_data - copied from /profile command
     if user_id not in user_data:
-
         # Initialize profile and save it to user_data
-        user_data[user_id] = {'spent': 0,
-                            'loyalty_points': 0, 
-                            'bank': 0, 
-                            'last_chest_redeem': ""} 
-    
+        user_data[user_id] = {
+            'spent': 0,
+            'loyalty_points': 0,
+            'bank': 0,
+            'last_chest_redeem': ""  # Initialize to empty string
+        }
+
+    # Retrieve the last redeem time, ensuring it's safe to access
+    last_redeem_time = user_data[user_id]['last_chest_redeem']
+    current_time = str(datetime.now())[0:19]
+
     # If last redeem date is not the same as the current date then allow daily command
-    elif str(last_redeem_time)[0:9] != current_time[0:9]:
-        user_data[user_id]['last_chest_redeem'] = str(current_time)
+    if str(last_redeem_time)[0:10] != current_time[0:10]:  # Use [0:10] for date comparison
+        user_data[user_id]['last_chest_redeem'] = current_time
+
+        # Add a random amount to the user's bank
+        amount = r.randint(20000, 100000)
+        user_data[user_id]['bank'] += amount  # Directly add to bank
         save_data()
 
-
+        await interaction.response.send_message(f"You have received {amount} GP in your bank!")
     else:
         # Trim fractional part if it exists before converting to datetime
         last_redeem = datetime.strptime(last_redeem_time[:19], "%Y-%m-%d %H:%M:%S")
