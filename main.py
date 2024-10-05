@@ -301,6 +301,11 @@ async def subtract_lp(interaction: discord.Interaction, points: int, member: dis
     await interaction.response.send_message(f"Subtracted {points} loyalty points from {member.mention}'s profile!")
 
 
+@bot.tree.command(name='daily', description='Daily chest command')
+async def daily(interaction: discord.Interaction);
+    pass
+
+
 # Runs the bot
 bot.run(TOKEN)
 
