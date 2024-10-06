@@ -11,7 +11,9 @@ A multi-purpose Discord bot for my Talon RS Services Discord Server.
 
 ### Installing
 ```git clone git@github.com:joem04/talon-rs-discord-bot.git```
+
 ```cd talon-rs-discord-bot```
+
 ```pip install -r requirements.txt```
 
 ## Authors
