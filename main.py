@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 import random as r
 import logging
 
-
 # Configure logging
 logging.basicConfig(
     filename='bot_errors.log',
@@ -125,14 +124,14 @@ async def profile(interaction: discord.Interaction, member: discord.Member = Non
         # Create an embed for the profile
         embed = discord.Embed(
             title=f"{member.name}'s Profile",
-            color=discord.Color.red()  # Choose a color for the embed
+            color=discord.Color.red()  
         )
 
         # Set the description with the emoji directly included
         embed.description = (
-            f"<:gold:1289649818066616371> **Total GP Spent:** {formatted_spent}\n"  # Replace with actual emoji ID
+            f"<:gold:1289649818066616371> **Total GP Spent:** {formatted_spent}\n"  
             f"<:ticket:1289650551453126728> **Loyalty Points:** {loyalty_points}\n"
-            f"<:gold:1289649818066616371> **Bank:** {formatted_bank}\n"  # Replace with actual emoji ID
+            f"<:gold:1289649818066616371> **Bank:** {formatted_bank}\n"  
         )
 
         # Set the thumbnail using the user's avatar
@@ -186,7 +185,7 @@ async def paid(interaction: discord.Interaction, amount: str, member: discord.Me
                 await interaction.response.send_message(f"Failed to assign the 'Customer' role. Please contact an Admin: {e}", ephemeral=True)
                 return
 
-        paid_category_id = 1289320593472229428  # Adjust with your actual category ID
+        paid_category_id = 1289320593472229428  
 
         # Get the target category object
         paid_category = discord.utils.get(interaction.guild.categories, id=paid_category_id)
@@ -472,4 +471,3 @@ if __name__ == "__main__":
     except Exception as e:
         logging.critical("An unexpected error occurred while running the bot: %s", e)
         print("An unexpected error occurred. Please check the logs.")
-
