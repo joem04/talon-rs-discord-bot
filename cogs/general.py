@@ -1,63 +1,59 @@
+import logging
 import discord
 from discord import app_commands
 from discord.ext import commands
-from .database import DatabaseCog  # Import the DatabaseCog for database access
+from .database import DatabaseCog
 from utils import utils
+
+# Configure logging
+logging.basicConfig(level=logging.INFO,  # Change to DEBUG for more verbose output
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
 class GeneralCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.db_cog = DatabaseCog(bot)  # Create an instance of DatabaseCog
+        self.db_cog = DatabaseCog(bot)
 
-
-    # Slash command to display profile
     @app_commands.command(name="profile", description="Displays user profile")
     async def profile(self, interaction: discord.Interaction, member: discord.Member = None):
-        # If no user is mentioned, default to the author of the message
-        if member is None:
-            member = interaction.user
+        try:
+            if member is None:
+                member = interaction.user
+            
+            user_id = str(member.id)
+            logging.debug(f"[DEBUG] User ID: {user_id}")
 
-        user_id = str(member.id)
+            user_exists = await self.db_cog.ensure_user(user_id)
+            logging.debug(f"[DEBUG] User Exists: {user_exists}")
 
-        # Ensure the user has an entry in the database
-        user_exists = await self.db_cog.ensure_user(user_id)
+            user_data = await self.db_cog.fetch_user_data(user_id)
+            logging.debug(f"[DEBUG] User Data: {user_data}")
 
-        # Fetch user data from the database
-        user_data = await self.db_cog.fetch_user_data(user_id)
+            if user_data is None:
+                user_data = (0, 0, 0, "")
 
-        # If no data is found, it means the user was just added
-        if user_data is None:
-            user_data = (0, 0, 0, "")  # Default values for new users
+            spent, loyalty_points, bank, last_redeem = user_data
+            formatted_spent = utils.format_amount(spent)
+            formatted_bank = utils.format_amount(bank)
 
-        # Unpack user data
-        spent, loyalty_points, bank, last_redeem = user_data
+            embed = discord.Embed(
+                title=f"{member.name}'s Profile",
+                color=discord.Color.red()
+            )
+            embed.description = (
+                f"<:gold:1289649818066616371> **Total GP Spent:** {formatted_spent}\n"
+                f"<:ticket:1289650551453126728> **Loyalty Points:** {loyalty_points}\n"
+                f"<:gold:1289649818066616371> **Bank:** {formatted_bank}\n"
+            )
 
-        # Format the amounts 
-        formatted_spent = utils.format_amount(spent)
-        formatted_bank = utils.format_amount(bank)
+            embed.set_thumbnail(url=member.avatar.url)
+            embed.set_footer(text="Profile Info • Updated Now")
 
-        # Create an embed for the profile
-        embed = discord.Embed(
-            title=f"{member.name}'s Profile",
-            color=discord.Color.red()
-        )
+            await interaction.response.send_message(embed=embed)
 
-        # Set the description with the emoji directly included
-        embed.description = (
-            f"<:gold:1289649818066616371> **Total GP Spent:** {formatted_spent}\n"
-            f"<:ticket:1289650551453126728> **Loyalty Points:** {loyalty_points}\n"
-            f"<:gold:1289649818066616371> **Bank:** {formatted_bank}\n"
-        )
-
-        # Set the thumbnail using the user's avatar
-        embed.set_thumbnail(url=member.avatar.url)
-
-        # Set footer
-        embed.set_footer(text="Profile Info • Updated Now")
-
-        # Send the embed to the channel
-        await interaction.response.send_message(embed=embed)
-
+        except Exception as e:
+            logging.error(f"[ERROR] Exception in profile command: {e}")
+            await interaction.response.send_message(f"An error occurred: {str(e)}")
 
 async def setup(bot):
     await bot.add_cog(GeneralCog(bot))

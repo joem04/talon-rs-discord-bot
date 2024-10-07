@@ -4,6 +4,13 @@ from discord.ext import commands
 import os
 from dotenv import load_dotenv
 import asyncio
+import logging
+from cogs import database
+
+
+# Configure logging
+logging.basicConfig(level=logging.INFO,  # Change to DEBUG for more verbose output
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
 load_dotenv()
 
@@ -33,9 +40,12 @@ async def on_ready():
     try:
         synced_commands = await bot.tree.sync()
         print(f"[✓] Synced {len(synced_commands)} Commands.")
+        print(f"[✓] Registered Commands: {[command.name for command in bot.tree.get_commands()]}")
     except Exception as e:
-        print("[!] Error syncing commands: {e}")
-
+        print(f"[!] Error syncing commands: {e}")
+   
+   # Maybe init db here?
+   
 
 # Start the bot and load cogs
 async def main():

@@ -1,6 +1,11 @@
 import discord
 from discord.ext import commands
 import aiosqlite
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO,  # Change to DEBUG for more verbose output
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
 class DatabaseCog(commands.Cog):
     def __init__(self, bot):
@@ -25,6 +30,7 @@ class DatabaseCog(commands.Cog):
                 ''')
                 # Commit creation to db file
                 await db.commit()
+                logging.info("[✓] User data table created successfully.")
 
 
     # Ensure the current user has an entry in the database
