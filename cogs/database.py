@@ -45,6 +45,14 @@ class DatabaseCog(commands.Cog):
                     return True  # New entry created
                 return False  # Entry already exists
             
+    
+    # Fetch user data from the database
+    async def fetch_user_data(self, user_id):
+        async with aiosqlite.connect(self.db_name) as db:
+            async with db.cursor() as cursor:
+                await cursor.execute('SELECT spent, loyalty_points, bank, last_redeem FROM user_data WHERE user_id = ?', (user_id,))
+                return await cursor.fetchone()
+            
 
 async def setup(bot):
     await bot.add_cog(DatabaseCog(bot))     
