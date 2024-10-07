@@ -25,3 +25,22 @@ class DatabaseCog(commands.Cog):
                 ''')
                 # Commit creation to db file
                 await db.commit()
+
+
+    # Ensure the current user has an entry in the database
+    async def ensure_user(self, user_id, spent=0, loyalty_points=0, bank=0, last_redeem=''):
+        async with aiosqlite.connect(self.db_name) as db:
+            async with db.cursor() as cursor:
+                # Check if the user already has an entry
+                await cursor.execute('SELECT user_id FROM user_data WHERE user_id = ?', (user_id,))
+                result = await cursor.fetchone()
+
+                # If no entry exists, insert a new one
+                if result is None:
+                    await cursor.execute('''
+                        INSERT INTO user_data (user_id, spent, loyalty_points, bank, last_redeem)
+                        VALUES (?, ?, ?, ?, ?)
+                    ''', (user_id, spent, loyalty_points, bank, last_redeem))
+                    await db.commit()
+                    return True  # New entry created
+                return False  # Entry already exists
