@@ -2,6 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from .database import DatabaseCog  # Import the DatabaseCog for database access
+from utils import utils
 
 class GeneralCog(commands.Cog):
     def __init__(self, bot):
@@ -31,9 +32,9 @@ class GeneralCog(commands.Cog):
         # Unpack user data
         spent, loyalty_points, bank, last_redeem = user_data
 
-        # Format the amounts (if you have a format_amount function)
-        formatted_spent = format_amount(spent)
-        formatted_bank = format_amount(bank)
+        # Format the amounts 
+        formatted_spent = utils.format_amount(spent)
+        formatted_bank = utils.format_amount(bank)
 
         # Create an embed for the profile
         embed = discord.Embed(
