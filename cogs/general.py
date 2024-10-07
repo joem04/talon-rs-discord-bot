@@ -1,5 +1,6 @@
 import discord
 from discord import app_commands
+from discord.ext import commands
 from .database import DatabaseCog  # Import the DatabaseCog for database access
 
 class GeneralCog(commands.Cog):
