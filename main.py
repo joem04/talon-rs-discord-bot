@@ -5,7 +5,6 @@ import os
 from datetime import datetime, timedelta
 import random as r
 import logging
-import sqlite3
 
 # Configure logging
 logging.basicConfig(
@@ -15,16 +14,6 @@ logging.basicConfig(
 )
     
 token_file = 'token.env'
-
-# Initialise sqlite connection
-con = sqlite3.connect('users.db')
-
-# Initialise cursor
-cur = con.cursor()
-
-# Initialise table
-
-
 
 # Reads token file
 try:
