@@ -28,7 +28,7 @@ class DatabaseCog(commands.Cog):
 
 
     # Ensure the current user has an entry in the database
-    async def ensure_user(self, user_id, spent=0, loyalty_points=0, bank=0, last_redeem=''):
+    async def ensure_user(self, user_id, spent=0, loyalty_points=0, bank=0, last_redeem=''): # Set default values
         async with aiosqlite.connect(self.db_name) as db:
             async with db.cursor() as cursor:
                 # Check if the user already has an entry
@@ -44,3 +44,7 @@ class DatabaseCog(commands.Cog):
                     await db.commit()
                     return True  # New entry created
                 return False  # Entry already exists
+            
+
+async def setup(bot):
+    await bot.add_cog(DatabaseCog(bot))     
