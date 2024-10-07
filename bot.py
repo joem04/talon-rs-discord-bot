@@ -5,9 +5,6 @@ import os
 from dotenv import load_dotenv
 import asyncio
 
-# Cog imports
-from cogs import database
-
 load_dotenv()
 
 TOKEN = os.getenv('TOKEN')
