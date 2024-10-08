@@ -44,8 +44,12 @@ async def on_ready():
     except Exception as e:
         print(f"[!] Error syncing commands: {e}")
    
-   # Maybe init db here?
-   
+   # Init database on bot on_ready - IS CREATE IF NOT EXISTS so wont overwrite existing data
+    try:
+        db_cog = database.DatabaseCog(bot)
+        await db_cog.init_db()
+    except Exception as e:
+        logging.error(f"[ERROR] Exception in database init: {e}")
 
 # Start the bot and load cogs
 async def main():

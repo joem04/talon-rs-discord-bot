@@ -30,7 +30,7 @@ class DatabaseCog(commands.Cog):
                 ''')
                 # Commit creation to db file
                 await db.commit()
-                logging.info("[✓] User data table created successfully.")
+                logging.info("[✓] User data table loaded successfully.")
 
 
     # Ensure the current user has an entry in the database
