@@ -21,16 +21,17 @@ class GeneralCog(commands.Cog):
                 member = interaction.user
             
             user_id = str(member.id)
-            logging.debug(f"[DEBUG] User ID: {user_id}")
+            logging.info(f"[DEBUG] User ID: {user_id}")
 
             user_exists = await self.db_cog.ensure_user(user_id)
-            logging.debug(f"[DEBUG] User Exists: {user_exists}")
+            logging.info(f"[DEBUG] User Exists: {user_exists}")
 
             user_data = await self.db_cog.fetch_user_data(user_id)
-            logging.debug(f"[DEBUG] User Data: {user_data}")
+            logging.info(f"[DEBUG] User Data: {user_data}")
 
-            if user_data is None:
-                user_data = (0, 0, 0, "")
+            # Check if user_data is None - UNDEEDED AS ensure_user sets default values            
+            #if user_data is None:
+                #user_data = (0, 0, 0, "")
 
             spent, loyalty_points, bank, last_redeem = user_data
             formatted_spent = utils.format_amount(spent)
