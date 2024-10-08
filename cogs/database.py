@@ -48,8 +48,8 @@ class DatabaseCog(commands.Cog):
                         VALUES (?, ?, ?, ?, ?)
                     ''', (user_id, spent, loyalty_points, bank, last_redeem))
                     await db.commit()
-                    return True  # New entry created
-                return False  # Entry already exists
+                    return False  # New entry created - retuns False: user didnt exist
+                return True  # Entry already exists - returns True: user existed
             
     
     # Fetch user data from the database
@@ -57,7 +57,22 @@ class DatabaseCog(commands.Cog):
         async with aiosqlite.connect(self.db_name) as db:
             async with db.cursor() as cursor:
                 await cursor.execute('SELECT spent, loyalty_points, bank, last_redeem FROM user_data WHERE user_id = ?', (user_id,))
-                return await cursor.fetchone()
+                return await cursor.fetchone()    
+            
+
+    # Update a specific key with a given value
+    async def update_user_data(self, user_id, key, value):
+        if key not in ['spent', 'loyalty_points', 'bank', 'last_redeem']:
+            logging.error(f"Invalid key: {key}")
+            return False  # Invalid key
+
+        async with aiosqlite.connect(self.db_name) as db:
+            async with db.cursor() as cursor:
+                query = f'UPDATE user_data SET {key} = ? WHERE user_id = ?'
+                await cursor.execute(query, (value, user_id))
+                await db.commit()
+                logging.info(f"Updated {key} for user {user_id} with value {value}.")
+                return True  # Update successful
             
 
 async def setup(bot):
