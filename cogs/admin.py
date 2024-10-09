@@ -38,7 +38,7 @@ class AdminCog(commands.Cog):
 
             if user_updated:
                 logging.info(f"Updated {member.name}'s spent amount to {new_spent}")
-                await interaction.response.defer()
+                await interaction.response.defer() # Defer this respone as would be pinned later - maybe make emphermal??
             else:
                 logging.error(f"Failed to update {member.name}'s spent amount")
                 await interaction.response.send_message(f"Failed to update {member.name}'s spent amount")
@@ -119,7 +119,53 @@ class AdminCog(commands.Cog):
             else:
                 await interaction.followup.send("An error occurred while processing the payment. Please try again later.", ephemeral=True)
 
-            # Fix all responses
+            # Fix all responses - dont really need fixed rn - not priority
+
+
+    @app_commands.command(name="worker", description="Assigns worker to an order")
+    @commands.has_role("Admin")
+    async def worker(self, interaction: discord.Interaction, worker: discord.Member):
+        # Get the current thread    
+
+        thread = interaction.channel
+
+        # Ensure the command is called from a thread
+        if not isinstance(thread, discord.Thread):
+            await interaction.response.send_message("This command can only be used in a thread.", ephemeral=True)
+            return
+        
+        # Extract the ticked number from the thread name (assuming the format "Order: {ticket_number}")
+        try:
+            ticket_number = thread.name.split(": ")[1] # Space after colon
+        except IndexError:
+            await interaction.response.send_message("Failed to extract ticket number from the thread name.", ephemeral=True)
+            return
+        
+        # Find the channel with the matching ticket number
+        ticket_channel = discord.utils.get(interaction.guild.channels, name=f"ticket-{ticket_number}")
+
+        # Ensure the ticket channel exists
+        if ticket_channel is None:
+            await interaction.response.send_message("Failed to find the ticket channel.", ephemeral=True)
+            return
+
+        # Check if assigned member is a worker
+        worker_role = discord.utils.get(interaction.guild.roles, name="Worker")
+        if worker_role not in worker.roles:
+            await interaction.response.send_message("The assigned member is not a worker.", ephemeral=True)
+            return
+        
+            # Assign permissions to the worker for the ticket channel
+        try:
+            await ticket_channel.send(f"{worker.mention} has been assigned to this order.")
+        except discord.Forbidden:
+            await interaction.response.send_message("Failed to assign worker to the ticket channel.", ephemeral=True)
+            return
+        
+        # Delete thread after worker assignment - keeps the channel clean
+        await thread.delete()
+            
+
 
 async def setup(bot):
     await bot.add_cog(AdminCog(bot))
