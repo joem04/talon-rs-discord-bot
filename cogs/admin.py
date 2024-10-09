@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO,  # Change to DEBUG for more verbose outp
 class AdminCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.db_cog = DatabaseCog(bot)
+        self.db_cog = DatabaseCog(bot)    
 
     @app_commands.command(name="paid", description="Sets user order status to paid")
     async def paid(self, interaction: discord.Interaction, amount: str, member: discord.Member, order_note: str = None):
@@ -165,7 +165,6 @@ class AdminCog(commands.Cog):
         # Delete thread after worker assignment - keeps the channel clean
         await thread.delete()
             
-
 
 async def setup(bot):
     await bot.add_cog(AdminCog(bot))

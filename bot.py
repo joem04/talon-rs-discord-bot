@@ -1,6 +1,7 @@
 # External imports
 import discord 
 from discord.ext import commands
+from discord import app_commands
 import os
 from dotenv import load_dotenv
 import asyncio
@@ -34,6 +35,20 @@ async def load_cogs():
                 print(f"[!] Failed to load {filename}: {e}")
 
 
+# Reload cogs and resync commands
+@app_commands.command(name="reload", description="Reload cogs")
+async def reload(interaction: discord.Interaction):
+    for filename in os.listdir('./cogs'):
+        if filename.endswith('.py'):
+            try:
+                await bot.reload_extension(f'cogs.{filename[:-3]}')  # Await here
+                print(f"[✓] Reloaded{filename}")
+            except Exception as e:
+                print(f"[!] Failed to reload {filename}: {e}")
+    await interaction.response.send_message("Reloaded cogs")
+    await bot.tree.sync()  # Sync commands after reloading cogs
+
+
 # Sync / commands on bot startup and load cogs
 @bot.event
 async def on_ready():
@@ -50,6 +65,7 @@ async def on_ready():
         await db_cog.init_db()
     except Exception as e:
         logging.error(f"[ERROR] Exception in database init: {e}")
+
 
 # Start the bot and load cogs
 async def main():
